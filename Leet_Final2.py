@@ -5487,3 +5487,36 @@ def getMaxScore(nums1, nums2):
 # nums2 = [3,5,100]
 # print(getMaxScore(nums1, nums2))
 ##Time O(N)  space O(1)
+
+##1443. Minimum Time to Collect All Apples in a Tree
+# n = 7, edges = [[0,1],[0,2],[1,4],[1,5],[2,3],[2,6]],
+# hasApple = [false,false,true,false,false,true,false]
+# Output: 6
+
+def timeToAllApple(n, edges, hasApple):
+    graph = {}
+    for i in range(n):
+        graph[i] = []
+    for u, v in edges:
+        graph[u].append(v)
+        graph[v].append(u)
+
+    visited = set()
+    return timeToAllApple_DFS(graph, 0, visited, hasApple)
+
+def timeToAllApple_DFS(graph, node, visited, hasApple):
+    visited.add(node)
+    total_cost = 0
+    for nei in graph[node]:
+        if nei in visited:
+            continue
+        nei_cost = timeToAllApple_DFS(graph, nei, visited, hasApple)
+        if nei_cost or hasApple[nei]:
+            total_cost += nei_cost + 2
+    return total_cost
+
+# n = 7
+# edges = [[0,1],[0,2],[1,4],[1,5],[2,3],[2,6]]
+# hasApple = [False,False,True,False,False,True,False]
+# print(timeToAllApple(n, edges, hasApple))
+##Time O(N)  space O(N)
