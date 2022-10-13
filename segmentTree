@@ -68,3 +68,52 @@ arr = [1, 3, 5, 7, 9, 11]
 getSum(arr, 3, 5)    
 updateVal(arr, 5, 21)
 getSum(arr, 3, 5) 
+
+###=====================================================================================
+###=====================================================================================
+
+###Segment Tree range query min value
+from math import ceil, log2
+class segmentTree:
+    def __init__(self, arr):
+        self.arr = arr
+        self.st = self.constructMinTree()
+        
+    def constructMinTree(self):
+        n = len(self.arr)
+        x = int(ceil(log2(n)))
+        size = 2 * int(2**(x)) - 1
+        st = [0]*size
+        self.constructMinTree_Util(st, 0, n-1, 0)
+        return st
+    
+    def constructMinTree_Util(self, st, start, end, i):
+        if start == end:
+            st[i] = self.arr[start]
+            return st[i]
+        mid = start + (end-start) // 2
+        st[i] = min(self.constructMinTree_Util(st, start, mid, 2*i+1),\
+                    self.constructMinTree_Util(st, mid +1, end, 2*i+2))
+        return st[i]
+    
+    def rangeMin(self, qs, qe):
+        n = len(self.arr)
+        if qs < 0 or qe > n - 1 or qs > qe:
+            return "Invalid range"
+        return self.rangeMin_Util(0, n-1, qs, qe, 0)
+    
+    def rangeMin_Util(self, start, end, qs, qe, i):
+        if start >= qs and end <= qe:
+            return self.st[i]
+        if start > qe or end < qs:
+            return float('inf')
+        mid = start + (end-start) // 2
+        return min(self.rangeMin_Util(start, mid, qs, qe, 2*i+1),\
+                   self.rangeMin_Util(mid+1, end, qs, qe, 2*i+2))
+        
+        
+
+arr = [2,5,1,4,9,3]
+sgt = segmentTree(arr)
+sgt.st
+sgt.rangeMin(2, 5)
