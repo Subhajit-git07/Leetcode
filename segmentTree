@@ -1,0 +1,70 @@
+###Segment Tree
+from math import ceil, log2
+def segmentTree(arr):
+    n = len(arr)
+    x = (int)(ceil(log2(n)));
+    # Maximum size of segment tree
+    max_size = 2 * (int)(2**x) - 1;
+#     if input len is pow of 2 then size of 
+#     segment tree is 2*len - 1, otherwise
+#     size of segment tree is next (pow of 2 for len)*2 - 1.
+    st = [0]*max_size
+    constructSegTree(arr, 0, n-1, st, 0)
+    return st
+
+def constructSegTree(arr, start, end, st, i):
+    if start == end:
+        st[i] = arr[start]
+        return st[i]
+    
+    mid = start + (end-start) // 2
+    st[i] = constructSegTree(arr, start, mid, st, 2*i+1) + constructSegTree(arr, mid+1, end, st, 2*i+2)
+    return st[i]
+
+#arr = [1, 3, 5, 7, 9, 11]
+#st = segmentTree(arr)
+
+def getSum(arr, qs, qe):
+    n = len(arr)
+    st = segmentTree(arr)
+    if qs < 0 or qe > n - 1 or qs > qe:
+        return "invalid input"
+    return getSumUtil(st, 0, n-1, qs, qe, 0)
+
+def getSumUtil(st, start, end, qs, qe, i):
+    #if fuilly matched
+    if start >= qs and end <= qe:
+        return st[i]
+    ##if not matched then return 0
+    if start > qe or end < qs:
+        return 0
+    mid = start + (end-start) // 2
+    return getSumUtil(st, start, mid, qs, qe, 2*i+1) + getSumUtil(st, mid+1, end, qs, qe, 2*i+2)
+
+def updateVal(arr, idx, newVal):
+    n = len(arr)
+    st = segmentTree(arr)
+    if idx < 0 or idx > n - 1:
+        return "invalid index"
+    diff = newVal - arr[idx]
+    arr[idx] = newVal
+    updateValUtil(st, 0, n-1, idx, diff, 0)
+    
+def updateValUtil(st, start, end, idx, diff, i):
+    # Base Case: If the input index lies
+    # outside the range of this segment
+    if idx > end or idx < start:
+        return
+    # If the input index is in range of this node,
+    # then update the value of the node and its children
+    st[i] = st[i] + diff
+    if start != end:
+        mid = start + (end-start) // 2
+        updateValUtil(st, start, mid, idx, diff, 2*i+1)
+        updateValUtil(st, mid+1, end, idx, diff, 2*i+2)
+        
+
+arr = [1, 3, 5, 7, 9, 11]
+getSum(arr, 3, 5)    
+updateVal(arr, 5, 21)
+getSum(arr, 3, 5) 
